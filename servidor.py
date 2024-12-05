@@ -4,6 +4,7 @@ import socket
 clientes = []
 
 def main():
+    #                        Endereços IPv4 - protocolo TCP
     servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -14,44 +15,47 @@ def main():
         print(f"\n Erro ao iniciar o servidor: {e} \n")
         return
 
-    try:
-        while True:
+    while True:
+        try:
             cliente, addr = servidor.accept()
             clientes.append(cliente)
             print(f"Nova conexão {addr}. \n")
 
-            thread = threading.Thread(target=mensagens, args=[cliente,addr])
-            thread.start()
-    except:
-        servidor.close()
-        print("Servidor encerrado.")
+            thread1 = threading.Thread(target=receber_mensagens, args=[cliente])
 
-def mensagens(cliente,addr):
-    mensagem = None
+            thread1.start()
+            
+        except:
+            print("conexão encerrada.")
+            break
+    servidor.close()
 
+def receber_mensagens(cliente):
     while True:
         try:
-            mensagem = cliente.recv(2048).decode("utf-8")
-            if mensagem != None:
-                broadcast(mensagem, cliente)
+            mensagem = cliente.recv(2048).decode('utf-8')
+            if mensagem:
+                print(f"\n{mensagem}")
+                enviar_mensagens(cliente)
+            elif mensagem.lower == "exit":
+                deletar_cliente(cliente)
         except:
-            print(f"Conexão {addr} encerrada. \n")
-            deletar_cliente(cliente)
-            cliente.close()
             break
 
-def broadcast(mensagem,cliente):
-    for clienteitem in clientes:
-        if clienteitem != cliente:
-            try:
-                clienteitem.send(mensagem.encode("utf-8"))
-            except Exception as e:
-                print(f"Erro ao enviar mensagem para {clienteitem.getpeername()}: {e} \n")
-                deletar_cliente(clienteitem)
-             
+def enviar_mensagens(cliente):
+    print("Clientes:")
+    for i, cliente in enumerate(clientes):
+        print(f"{i} - {cliente.getpeername()}") 
+
+    indice = int(input("Selecione qual cliente deverá receber a resposta: "))
+    resposta = input("Digite a resposta: ")
+    cliente = clientes[indice]
+    cliente.send(resposta.encode("utf-8"))
+          
 def deletar_cliente(cliente):
     if cliente in clientes:
         clientes.remove(cliente)
+        print(f"Conexão com {cliente.getpeername()} encerrada.")
 
 if __name__ == "__main__":
     main()
