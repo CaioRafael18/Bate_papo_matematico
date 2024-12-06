@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
@@ -18,12 +19,11 @@ class Receber_mensagens extends Thread {
     @Override
     public void run() {
         try {
-            System.out.println("OOOppaaa");
-            BufferedReader mensagem = new BufferedReader(new InputStreamReader(cliSocket.getInputStream()));
-            System.out.println("Mensage: " + mensagem);
-            while (mensagem.readLine() != null) {
-                System.out.println("Servidor: " + mensagem.readLine());
+            Scanner scanner = new Scanner(cliSocket.getInputStream());
+            while (scanner.hasNextLine()) {
+                System.out.println(scanner.nextLine());
             }
+            scanner.close();
         } catch (Exception e) {
             System.out.print("\nErro inesperado: " + e);
         }
@@ -40,18 +40,19 @@ class Enviar_mensagens extends Thread {
     @Override
     public void run() {
         try {
-            Scanner teclado = new Scanner(System.in);
+            System.out.print("Digite mensagens para o servidor (ou 'exit' para encerrar): ");
 
-            PrintStream saida = new PrintStream(cliSocket.getOutputStream());
+            Scanner teclado = new Scanner(System.in);
+            PrintWriter saida = new PrintWriter(cliSocket.getOutputStream(), true);
             while (teclado.hasNextLine()) {
-                if (teclado.nextLine().equalsIgnoreCase("exit")) {
-                    System.out.println("Encerrando conexão...");
-                    cliSocket.close();
-                    teclado.close();
-                    break;
-                }
+                // if (teclado.has) {
+                //     System.out.println("Encerrando conexão...");
+                //     teclado.close();
+                //     cliSocket.close();
+                //     break;
+                // }
                 saida.println(teclado.nextLine());
-            }         
+            }
         } catch (Exception e) {
             System.out.print("\nErro inesperado: " + e);
         }
@@ -66,7 +67,7 @@ public class Cliente {
             System.out.println("Conectado ao servidor!");
             System.out.print("Usuário: ");
             String usuario = teclado.next();
-            System.out.print(usuario + " conectado. \nQuando desejar encerrar a conexão, digite 'exit'. \n");
+            System.out.println(usuario + " conectado.");
 
             Thread recebeThread = new Receber_mensagens(cliente);
             recebeThread.start();
@@ -83,3 +84,4 @@ public class Cliente {
         }
     }
 }
+
