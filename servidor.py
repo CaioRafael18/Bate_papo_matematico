@@ -8,9 +8,11 @@ def main():
     servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        servidor.bind(("localhost", 1227))
+        servidor.bind(("localhost", 1229))
         servidor.listen()
         print("Servidor iniciado... \n")
+        thread1 = threading.Thread(target=enviar_mensagens)
+        thread1.start()
     except Exception as e:
         print(f"\n Erro ao iniciar o servidor: {e} \n")
         return
@@ -21,10 +23,7 @@ def main():
             clientes.append(cliente)
             print(f"\n Nova conexão {addr}. \n")
 
-            thread1 = threading.Thread(target=receber_mensagens, args=[cliente])
-            thread2 = threading.Thread(target=enviar_mensagens, args=[cliente])
-
-            thread1.start()
+            thread2 = threading.Thread(target=receber_mensagens, args=[cliente])
             thread2.start()
         except:
             print("conexão encerrada.")
@@ -42,7 +41,7 @@ def receber_mensagens(cliente):
         except:
             break
         
-def enviar_mensagens(cliente):
+def enviar_mensagens():
     while len(clientes) > 0:
         print("Clientes:")
         for i, cliente in enumerate(clientes):
@@ -56,7 +55,7 @@ def enviar_mensagens(cliente):
         except Exception as e:
             print(f"\nErro inesperado: {e}")
             break
-        
+
 def deletar_cliente(cliente):
     if cliente in clientes:
         clientes.remove(cliente)
