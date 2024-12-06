@@ -45,12 +45,13 @@ class Enviar_mensagens extends Thread {
             Scanner teclado = new Scanner(System.in);
             PrintWriter saida = new PrintWriter(cliSocket.getOutputStream(), true);
             while (teclado.hasNextLine()) {
-                // if (teclado.has) {
-                //     System.out.println("Encerrando conexão...");
-                //     teclado.close();
-                //     cliSocket.close();
-                //     break;
-                // }
+                String mensagem = teclado.nextLine();
+                if (mensagem.equalsIgnoreCase("exit")) {
+                    System.out.println("Encerrando conexão...");
+                    teclado.close();
+                    cliSocket.close();
+                    break;
+                }
                 saida.println(teclado.nextLine());
             }
         } catch (Exception e) {
