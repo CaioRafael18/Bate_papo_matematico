@@ -14,7 +14,7 @@ def main():
     print(f'\n{usuario} Conectado. \nQuando desejar encerrar a conexão, digite "exit". \n')
 
     thread1 = threading.Thread(target=receber_mensagens, args=[cliente])
-    thread2 = threading.Thread(target=enviar_mensagens, args=[cliente,usuario])
+    thread2 = threading.Thread(target=enviar_mensagens, args=[cliente, usuario])
 
     thread1.start()
     thread2.start()

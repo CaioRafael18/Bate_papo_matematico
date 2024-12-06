@@ -1,18 +1,27 @@
 import threading
 import socket
+import subprocess
 
-clientes = []
+import enviar_msg
+
+
+# Abrir dois novos terminais, cada um rodando um script diferente
+# subprocess.run('start cmd /k "python script1.py"', shell=True)
+# subprocess.run('start cmd /k "python script2.py"', shell=True)
 
 def main():
     #                        Endereços IPv4 - protocolo TCP
     servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    clientes = []
 
     try:
-        servidor.bind(("localhost", 1229))
+        servidor.bind(("localhost", 1212))
         servidor.listen()
         print("Servidor iniciado... \n")
-        thread1 = threading.Thread(target=enviar_mensagens)
-        thread1.start()
+
+        enviaThread = threading.Thread(target=enviar_msg.enviar_mensagens, args=[clientes])
+        enviaThread.start()
+        
     except Exception as e:
         print(f"\n Erro ao iniciar o servidor: {e} \n")
         return
@@ -21,10 +30,10 @@ def main():
         try:
             cliente, addr = servidor.accept()
             clientes.append(cliente)
-            print(f"\n Nova conexão {addr}. \n")
+            print(f"\nNova conexão {addr}. \n")
 
-            thread2 = threading.Thread(target=receber_mensagens, args=[cliente])
-            thread2.start()
+            recebeThread = threading.Thread(target=receber_mensagens, args=[cliente])
+            recebeThread.start()
         except:
             print("conexão encerrada.")
             break
@@ -39,21 +48,6 @@ def receber_mensagens(cliente):
             elif mensagem.lower() == "exit":
                 deletar_cliente()
         except:
-            break
-        
-def enviar_mensagens():
-    while len(clientes) > 0:
-        print("Clientes:")
-        for i, cliente in enumerate(clientes):
-            print(f"{i} - {cliente.getpeername()}") 
-
-        try:
-            indice = int(input("Selecione qual cliente deverá receber a resposta: "))
-            resposta = input("Digite a resposta: ")
-            cliente = clientes[indice]
-            cliente.send(resposta.encode("utf-8"))
-        except Exception as e:
-            print(f"\nErro inesperado: {e}")
             break
 
 def deletar_cliente(cliente):

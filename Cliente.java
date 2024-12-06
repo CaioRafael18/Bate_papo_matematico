@@ -1,9 +1,6 @@
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -18,14 +15,17 @@ class Receber_mensagens extends Thread {
 
     @Override
     public void run() {
-        try {
-            Scanner scanner = new Scanner(cliSocket.getInputStream());
-            while (scanner.hasNextLine()) {
-                System.out.println(scanner.nextLine());
+        while (true) {
+            try {
+                Scanner scanner = new Scanner(cliSocket.getInputStream());
+                while (scanner.hasNextLine()) {
+                    System.out.println("Servidor: " + scanner.nextLine());
+                }
+                scanner.close();
+            } catch (Exception e) {
+                System.out.print("\nErro inesperado: " + e);
+                break;
             }
-            scanner.close();
-        } catch (Exception e) {
-            System.out.print("\nErro inesperado: " + e);
         }
     }   
 }
@@ -40,7 +40,7 @@ class Enviar_mensagens extends Thread {
     @Override
     public void run() {
         try {
-            System.out.print("Digite mensagens para o servidor (ou 'exit' para encerrar): ");
+            System.out.println("Digite mensagens para o servidor (ou 'exit' para encerrar):");
 
             Scanner teclado = new Scanner(System.in);
             PrintWriter saida = new PrintWriter(cliSocket.getOutputStream(), true);
@@ -52,7 +52,7 @@ class Enviar_mensagens extends Thread {
                     cliSocket.close();
                     break;
                 }
-                saida.println(teclado.nextLine());
+                saida.println(mensagem);
             }
         } catch (Exception e) {
             System.out.print("\nErro inesperado: " + e);
