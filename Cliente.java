@@ -20,6 +20,7 @@ class Receber_mensagens extends Thread {
                 Scanner scanner = new Scanner(cliSocket.getInputStream());
                 while (scanner.hasNextLine()) {
                     System.out.println("Servidor: " + scanner.nextLine());
+                    System.out.print("\n");
                 }
                 scanner.close();
             } catch (Exception e) {
@@ -32,27 +33,30 @@ class Receber_mensagens extends Thread {
 
 class Enviar_mensagens extends Thread {
     private Socket cliSocket;
+    private String usuario;
 
-    public Enviar_mensagens(Socket cliSocket) {
+    public Enviar_mensagens(Socket cliSocket, String usuario) {
         this.cliSocket = cliSocket;
+        this.usuario = usuario;
     }
 
     @Override
     public void run() {
         try {
-            System.out.println("Digite mensagens para o servidor (ou 'exit' para encerrar):");
+            System.out.println("Digite mensagens para o servidor (ou 'exit' para encerrar): \n");
 
             Scanner teclado = new Scanner(System.in);
             PrintWriter saida = new PrintWriter(cliSocket.getOutputStream(), true);
             while (teclado.hasNextLine()) {
                 String mensagem = teclado.nextLine();
+                System.out.print("\n");
                 if (mensagem.equalsIgnoreCase("exit")) {
-                    System.out.println("Encerrando conexão...");
+                    System.out.println("\nEncerrando conexão...");
                     teclado.close();
                     cliSocket.close();
                     break;
                 }
-                saida.println(mensagem);
+                saida.printf("<%s> %s", usuario, mensagem);
             }
         } catch (Exception e) {
             System.out.print("\nErro inesperado: " + e);
@@ -67,13 +71,13 @@ public class Cliente {
             Scanner teclado = new Scanner(System.in);
             System.out.println("Conectado ao servidor!");
             System.out.print("Usuário: ");
-            String usuario = teclado.next();
+            String usuario = teclado.nextLine();
             System.out.println(usuario + " conectado.");
 
             Thread recebeThread = new Receber_mensagens(cliente);
             recebeThread.start();
 
-            Thread enviaThread = new Enviar_mensagens(cliente);
+            Thread enviaThread = new Enviar_mensagens(cliente, usuario);
             enviaThread.start();
 
             recebeThread.join();

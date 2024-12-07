@@ -11,7 +11,7 @@ def main():
         return 
 
     usuario = input("Usuário: ")
-    print(f'\n{usuario} Conectado. \nQuando desejar encerrar a conexão, digite "exit". \n')
+    print(f'\n{usuario} Conectado. \nQuando desejar encerrar a conexão, digite "exit".')
 
     thread1 = threading.Thread(target=receber_mensagens, args=[cliente])
     thread2 = threading.Thread(target=enviar_mensagens, args=[cliente, usuario])
@@ -27,7 +27,7 @@ def receber_mensagens(cliente):
         try:
             mensagem = cliente.recv(2048).decode('utf-8')
             if mensagem:
-                print(f"\n{mensagem}")
+                print(f"<Servidor> {mensagem}\n")
             else:
                 print("\nConexão encerrada pelo servidor.")
                 break
