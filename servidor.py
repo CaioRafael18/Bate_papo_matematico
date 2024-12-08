@@ -12,7 +12,7 @@ def conectar_servidor():
     servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        servidor.bind(("localhost", 1233))
+        servidor.bind(("localhost", 1212))
         servidor.listen()
         print("Servidor iniciado... \n")
         enviarThread = threading.Thread(target=enviar_mensagens)
